@@ -1,0 +1,12 @@
+---
+# tasks file for change-password
+
+- name: Change root and mehlj password
+  vars:
+    credentials: "{{ lookup('amazon.aws.aws_secret', secret_name) }}"
+  user:
+    name: "{{ item }}"
+    password: "{{ credentials.vsphere | password_hash('sha512') }}"
+  loop:
+    - mehlj
+    - root

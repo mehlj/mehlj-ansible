@@ -1,0 +1,32 @@
+---
+# tasks file for install-docker
+- name: Create Docker group
+  group:
+    name: docker
+    state: present
+
+- name: Add user to Docker group
+  user:
+    name: "{{ docker_user }}"
+    groups: docker
+    append: yes
+
+- name: Configure Docker to start on boot
+  systemd:
+    name: docker
+    enabled: yes
+
+- name: Configure Containerd to start on boot
+  systemd:
+    name: containerd
+    enabled: yes
+
+- name: Build daemon.json from template
+  template:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
+
+- name: Restart Docker
+  service:
+    name: docker
+    state: restarted

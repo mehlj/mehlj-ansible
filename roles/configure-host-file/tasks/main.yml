@@ -1,0 +1,15 @@
+---
+# tasks file for configure-host-file
+- name: Add hostnames of swarm hosts
+  blockinfile:
+    path: /etc/hosts
+    block: |
+      192.168.1.210 k8snode0.lab.io k8snode0
+      192.168.1.211 k8snode1.lab.io k8snode1
+      192.168.1.212 k8snode2.lab.io k8snode2
+      192.168.1.210 app.lab.io
+      192.168.1.211 app.lab.io
+      192.168.1.212 app.lab.io
+      192.168.1.210 hello2.lab.io
+      192.168.1.211 hello2.lab.io
+      192.168.1.212 hello2.lab.io

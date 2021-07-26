@@ -1,0 +1,55 @@
+---
+# tasks file for install-containerd
+
+- name: Install and configure prerequisites
+  include: prereqs.yml
+
+- name: Remove conflicting container packages with containerd
+  yum:
+    name:
+      - podman
+      - buildah
+      - runc
+    state: absent
+
+- name: Install yum-utils
+  yum:
+    name: yum-utils
+    state: latest
+
+- name: Add Docker repository
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
+
+- name: Install containerd
+  yum:
+    name: containerd.io
+    state: latest
+
+- name: Create containerd configuration file path
+  file:
+    path: /etc/containerd/
+    state: directory
+    mode: '0755'
+
+- name: Check if configuration file is already present
+  stat:
+    path: /etc/containerd/config.toml
+  register: containerd_config
+
+- name: Populate configuration file with default values
+  shell: containerd config default | tee /etc/containerd/config.toml
+  when: not containerd_config.stat.exists
+
+- name: Use the systemd cgroup driver
+  lineinfile:
+    path: /etc/containerd/config.toml
+    insertafter: '\[plugins\.\"io\.containerd\.grpc\.v1\.cri\"\.containerd\.runtimes\.runc\.options\]'
+    line: "            SystemdCgroup = true"
+    state: present
+
+- name: Restart containerd
+  service:
+    name: containerd
+    state: restarted

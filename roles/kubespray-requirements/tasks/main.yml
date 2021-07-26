@@ -1,0 +1,93 @@
+---
+# tasks file for kubespray-requirements
+- name: Build kubernetes sysctl parameters
+  template:
+    src: 99-kubernetes-cri.conf
+    dest: /etc/sysctl.d/99-kubernetes-cri.conf
+
+- name: Apply new sysctl parameters
+  shell: sysctl --system
+
+- name: Allow firewall ports for control-plane and worker nodes
+  firewalld:
+    port: "{{ item }}"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  loop:
+    - 6443/tcp
+    - 16443/tcp
+    - 4001/tcp
+    - 2379-2380/tcp
+    - 10250/tcp
+    - 10251/tcp
+    - 10252/tcp
+    - 15600/tcp
+    - 15601/tcp
+    - 15600/udp
+    - 15601/udp
+    - 30000-32767/tcp
+    - 10001/udp
+    - 6781/tcp
+    - 6782/tcp
+    - 6783/tcp
+    - 6783/udp
+    - 6784/tcp
+    - 6784/udp
+    - 443/tcp
+    - 53/tcp
+    - 53/udp
+    - 80/tcp
+    - 8080/tcp
+
+- name: Allow masquerading
+  firewalld:
+    masquerade: "yes"
+    state: enabled
+    permanent: yes
+    zone: public
+
+- name: Allow ESP traffic
+  firewalld:
+    rich_rule: rule protocol value=esp accept
+    permanent: yes
+    immediate: yes
+    state: enabled
+
+- name: Disable current swap
+  shell: swapoff -a
+
+- name: Disable swap permanently
+  lineinfile:
+    path: /etc/fstab
+    state: absent
+    regexp: 'swap'
+
+# note - may need more SELinux configuration than this. The docs just say to disable it
+- name: Enable container_manage_cgroup SELinux boolean 
+  seboolean:
+    name: container_manage_cgroup
+    state: yes
+    persistent: yes
+
+- name: Remove conflicting container packages with containerd
+  yum:
+    name:
+      - podman
+      - buildah
+      - runc
+    state: absent
+
+- name: Enable firewalld denied logging
+  lineinfile:
+    path: /etc/firewalld/firewalld.conf
+    regexp: '^LogDenied='
+    line: LogDenied=all
+
+- name: Reload firewalld
+  shell: firewall-cmd --reload
+
+- name: Add future kubectl directory to PATH variable
+  copy:
+    dest: /etc/profile.d/kubectl-path.sh
+    content: 'PATH=$PATH:/usr/local/bin/'

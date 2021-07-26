@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mehlj-pipeline-svc
+  labels:
+    app: mehlj-pipeline
+spec:
+  ports:
+  - port: 3000
+    protocol: TCP
+  selector:  # Label selector
+    app: mehlj-pipeline

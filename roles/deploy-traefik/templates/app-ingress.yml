@@ -1,0 +1,17 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: mehlj-pipline-ingress-route
+  namespace: default
+spec:
+  entryPoints:
+    - web
+  routes:
+  - match: Host(`app.lab.io`) && PathPrefix(`/`)
+    kind: Rule
+    services:
+    # The service name and port must match the Service
+    # specified in the deploy file
+    - name: mehlj-pipeline-svc
+      port: 3000

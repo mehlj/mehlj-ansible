@@ -1,0 +1,26 @@
+apiVersion: apps/v1       # specify the API version to use. Deployment objects are always (in newer k8s versions) in the apps/v1 API group.
+kind: Deployment          # kind describes to K8s what type of object this YAML defines
+metadata:                 # metadata section is where we give the Deployment a name and labels.
+  name: hello2-deploy      # this deployment will be named 'hello-deploy'
+spec:                     # spec section: where most of the action happens. Anything below .spec relates to the Pod, and anything below .spec.template relates to the Pod template(s) that the Deployment will manage. In this case, there is only one template (k8sbook)
+  replicas: 10
+  selector:               # list of labels that Pods must have in order for the Deployment to manage them.
+    matchLabels:
+      app: hello2
+  minReadySeconds: 10     # tells k8s to wait for 10 seconds between each Pod being updated.
+  strategy:               # tells k8s how to perform updates to the Pods managed by the deployment.
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1   # never have more than one pod below desired state (in this case, never less than 9 during the update process)
+      maxSurge: 1         # never have more than one Pod above desired state (in this case, never more than 11 during the update process)
+  template:
+    metadata:
+      labels:
+        app: hello2  # Pod labels
+                          # This label matches the Service's label selector
+    spec:
+      containers:
+      - name: hello2-pod
+        image: nigelpoulton/k8sbook:latest
+        ports:
+        - containerPort: 8080

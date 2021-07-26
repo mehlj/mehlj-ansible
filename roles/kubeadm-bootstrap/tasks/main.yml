@@ -1,0 +1,35 @@
+---
+# tasks file for kubeadm-bootstrap
+
+# note - from the k8s docs about control-plan high availability:
+# If you have plans to upgrade this single control-plane kubeadm cluster to high availability,
+# you should specify the --control-plane-endpoint to set the shared endpoint for all control-plane nodes.
+# Such an endpoint can be either a DNS name or an IP address of a load-balancer.
+- name: Initialize control-plane node
+  become: yes
+  shell: kubeadm init
+
+- name: Create .kube in kubectl user's home directory
+  file:
+    path: "{{ lookup('env','HOME') }}/.kube"
+    state: directory
+    mode: 0755
+    owner: "{{ kubectl_user }}"
+    group: "{{ kubectl_user }}"
+
+- name: Copy admin.conf to user's home directory
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: "{{ lookup('env','HOME') }}/.kube/config"
+    owner: "{{ kubectl_user }}"
+    group: "{{ kubectl_user }}"
+
+# note - from k8s docs about Pod networking:
+# You must deploy a Container Network Interface (CNI) based Pod network add-on so that your Pods can communicate with each other.
+# Cluster DNS (CoreDNS) will not start up before a network is installed.
+- name: Install CNI based Pod network add-on Weave Net
+  become: yes
+  shell: kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+

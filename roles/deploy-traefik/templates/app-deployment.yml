@@ -1,0 +1,25 @@
+apiVersion: apps/v1       
+kind: Deployment          
+metadata:                
+  name: mehlj-pipeline-deploy      
+spec:                   
+  replicas: 10
+  selector:               
+    matchLabels:
+      app: mehlj-pipeline
+  minReadySeconds: 10     
+  strategy:               
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1   
+      maxSurge: 1         
+  template:
+    metadata:
+      labels:
+        app: mehlj-pipeline 
+    spec:
+      containers:
+      - name: mehlj-pipeline-pod
+        image: mehlj/mehlj-pipeline:latest
+        ports:
+        - containerPort: 3000

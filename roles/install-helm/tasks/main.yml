@@ -1,0 +1,14 @@
+---
+# tasks file for install-helm
+- name: Unpack helm tarball
+  unarchive:
+    src: "{{ helm_archive_name }}"
+    dest: /tmp/
+
+- name: Install helm
+  copy:
+    src: "/tmp/{{ helm_arch }}/helm"
+    dest: /usr/local/bin/
+    mode: 0755
+    remote_src: yes
+  become: yes

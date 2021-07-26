@@ -1,0 +1,56 @@
+---
+# tasks file for install-kubeadm
+
+# firewall ports ref https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+
+- name: Allow firewall ports for control-plane and worker nodes
+  firewalld:
+    port: "{{ item }}"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  loop:
+    - 6443/tcp
+    - 2379-2380/tcp
+    - 10250/tcp
+    - 10251/tcp
+    - 10252/tcp
+    - 30000-32767/tcp
+
+- name: Disable current swap
+  shell: swapoff -a
+
+- name: Disable swap permanently
+  lineinfile:
+    path: /etc/fstab
+    state: absent
+    regexp: 'swap'
+
+- name: Add kubernetes repository file
+  template:
+    src: kubernetes.repo
+    dest: /etc/yum.repos.d/kubernetes.repo
+
+# note - may need more SELinux configuration than this. The docs just say to disable it
+- name: Enable container_manage_cgroup SELinux boolean 
+  seboolean:
+    name: container_manage_cgroup
+    state: yes
+    persistent: yes
+
+- name: Install kubeadm packages
+  yum:
+    name:
+      - kubelet
+      - kubeadm
+      - kubectl
+    state: present
+    disable_excludes: kubernetes
+
+- name: Start and enable kubelet
+  systemd:
+    name: kubelet
+    enabled: yes
+    state: started
+# note - after this:
+# The kubelet is now restarting every few seconds, as it waits in a crashloop for kubeadm to tell it what to do.

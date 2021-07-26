@@ -1,0 +1,41 @@
+---
+# tasks file for install-docker
+
+- name: CentOS 7 specific Docker installation
+  block:
+    - name: Install yum-utils
+      yum:
+        name: yum-utils
+        state: latest
+
+    - name: Add Docker repository
+      get_url:
+          url: https://download.docker.com/linux/centos/docker-ce.repo
+          dest: /etc/yum.repos.d/docker-ce.repo
+
+    - name: Install Docker CE
+      yum:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: latest
+
+    - name: Start Docker
+      service:
+        name: docker
+        state: started
+
+    - name: Perform postinstall tasks
+      include: postinstall.yml
+  when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == '7'
+  become: true
+
+- name: CentOS 8/Stream specific Podman installation
+  block:
+    - name: Install podman
+      yum:
+        name: podman
+        state: latest
+  when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == '8'
+  become: true

@@ -1,0 +1,7 @@
+---
+# tasks file for install-ssh-key
+- name: Add your ssh key to authorized_keys
+  authorized_key:
+    user: mehlj
+    state: present
+    key: "{{ lookup('file', 'id_rsa.pub') }}"

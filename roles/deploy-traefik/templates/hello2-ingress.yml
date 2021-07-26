@@ -1,0 +1,17 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: hello2-ingress-route
+  namespace: default
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`hello2.lab.io`) && PathPrefix(`/`)
+    kind: Rule
+    services:
+    # The service name and port must match the Service
+    # specified in the deploy file
+    - name: hello2-svc
+      port: 8080

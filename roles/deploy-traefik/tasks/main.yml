@@ -1,0 +1,109 @@
+---
+# tasks file for deploy-traefik
+- name: Add helm repo
+  shell: /usr/local/bin/helm repo add traefik https://helm.traefik.io/traefik
+
+- name: Update helm repos
+  shell: /usr/local/bin/helm repo update
+
+- name: Wait for kubernetes API to respond
+  wait_for:
+    port: 6443
+    delay: 10
+
+- name: Merge public cert
+  copy:
+    src: cert.crt
+    dest: /tmp/cert.crt
+
+- name: Merge private cert
+  copy:
+    src: key.pem
+    dest: /tmp/key.pem
+
+- name: Add certs to kubernetes cluster as a secret
+  shell: /usr/local/bin/kubectl create secret tls custom-default-cert --cert cert.crt --key key.pem
+  args:
+    chdir: /tmp/
+
+- name: Deploy traefik
+  shell: /usr/local/bin/helm install traefik --set service.type=NodePort --set ports.web.nodePort=30001 --set ports.websecure.nodePort=30002 --set ports.websecure.tls.enabled=true --set deployment.replicas=3 traefik/traefik --version 9.19.2
+  args:
+    chdir: /tmp/
+
+- name: Create TLSStore with custom certs for Traefik
+  template:
+    src: tlsstore.yml
+    dest: /tmp/tlsstore.yml
+
+- name: Apply TLSStore YAML
+  shell: /usr/local/bin/kubectl apply -f /tmp/tlsstore.yml
+
+- name: Merge mehlj-pipeline deployment YAML
+  template:
+    src: app-deployment.yml
+    dest: /tmp/app-deployment.yml
+
+- name: Apply mehlj-pipeline deployment YAML
+  shell: /usr/local/bin/kubectl apply -f /tmp/app-deployment.yml
+
+- name: Merge deployment2 YAML
+  template:
+    src: deployment2.yml
+    dest: /tmp/deployment2.yml
+
+- name: Apply deployment2 YAML
+  shell: /usr/local/bin/kubectl apply -f /tmp/deployment2.yml
+
+- name: Merge mehlj-pipeline service YAML
+  template:
+    src: app-svc.yml
+    dest: /tmp/app-svc.yml
+
+- name: Apply mehlj-pipeline service YAML
+  shell: /usr/local/bin/kubectl apply -f /tmp/app-svc.yml
+
+- name: Merge service2 YAML
+  template:
+    src: svc2.yml
+    dest: /tmp/svc2.yml
+
+- name: Apply service2 YAML
+  shell: /usr/local/bin/kubectl apply -f /tmp/svc2.yml
+
+- name: Merge mehlj-pipeline ingress YAML
+  template:
+    src: app-ingress.yml
+    dest: /tmp/app-ingress.yml
+
+- name: Apply mehlj-pipeline ingress YAML
+  shell: /usr/local/bin/kubectl apply -f /tmp/app-ingress.yml
+
+- name: Merge hello2 ingress YAML
+  template:
+    src: hello2-ingress.yml
+    dest: /tmp/hello2-ingress.yml
+
+- name: Apply hello2 ingress YAML
+  shell: /usr/local/bin/kubectl apply -f /tmp/hello2-ingress.yml
+
+- name: Wait for http://app.lab.io to respond externally via ingress
+  uri:
+    url: "http://app.lab.io:30001"
+    method: GET
+    follow_redirects: none
+  register: _result
+  until: _result.status == 200
+  retries: 30
+  delay: 5
+
+- name: Wait for https://hello2.lab.io to respond externally via ingress
+  uri:
+    url: "https://hello2.lab.io:30002"
+    method: GET
+    follow_redirects: none
+    validate_certs: no
+  register: _result
+  until: _result.status == 200
+  retries: 30
+  delay: 5

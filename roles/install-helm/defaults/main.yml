@@ -1,0 +1,5 @@
+---
+# defaults file for install-helm
+helm_arch: linux-amd64
+helm_version: v3.6.0-rc.1
+helm_archive_name: "helm-{{ helm_version }}-{{ helm_arch }}.tar.gz"
