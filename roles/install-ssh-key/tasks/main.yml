@@ -5,3 +5,9 @@
     user: mehlj
     state: present
     key: "{{ lookup('file', 'id_rsa.pub') }}"
+
+- name: Install github-runner key to authorized_keys
+  authorized_key:
+    user: root
+    state: present
+    key: "{{ lookup('file', 'github.pub') }}"
