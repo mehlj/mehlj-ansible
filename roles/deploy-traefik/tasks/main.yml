@@ -19,10 +19,18 @@
     - cert.crt
     - key.pem
 
+- name: Remove k8s secret if exists
+  shell: /usr/local/bin/kubectl delete secrets custom-default-cert
+  ignore_errors: yes
+  
 - name: Add certs to kubernetes cluster as a secret
   shell: /usr/local/bin/kubectl create secret tls custom-default-cert --cert cert.crt --key key.pem
   args:
     chdir: /tmp/
+
+- name: Delete traefik deployment if exists
+  shell: /usr/local/bin/helm uninstall traefik
+  ignore_errors: yes
 
 - name: Deploy traefik
   shell: /usr/local/bin/helm install traefik --set service.type=NodePort --set ports.web.nodePort=30001 --set ports.websecure.nodePort=30002 --set ports.websecure.tls.enabled=true --set deployment.replicas=3 traefik/traefik --version 9.19.2
