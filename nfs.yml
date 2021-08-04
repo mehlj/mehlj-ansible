@@ -1,0 +1,5 @@
+---
+- name: Install and configure NFS server
+  hosts: felwithe
+  roles:
+    - install-nfs

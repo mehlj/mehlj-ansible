@@ -1,0 +1,38 @@
+---
+# tasks file for install-nfs
+- name: Install nfs packages
+  yum:
+    name: nfs-utils
+    state: latest
+
+- name: Start and enable daemon
+  systemd:
+    name: nfs-server
+    enabled: yes
+    state: started
+
+- name: Create directory to be exported
+  file:
+    path: /mnt/shares/mehlj-pipeline/
+    state: directory
+    mode: '0755'
+
+- name: Add directories to /etc/exports
+  blockinfile:
+    path: /etc/exports
+    block: |
+      /mnt/shares/mehlj-pipeline          192.168.1.0/24(rw,sync)
+
+- name: Export directories
+  shell: exportfs -arv
+
+- name: Open firewall ports
+  firewalld:
+    service: "{{ item }}"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  loop:
+    - nfs
+    - rpc-bind
+    - mountd
