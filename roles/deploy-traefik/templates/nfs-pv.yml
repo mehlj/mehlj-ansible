@@ -9,10 +9,7 @@ spec:
   accessModes:
     - ReadWriteMany                       # access mode
   persistentVolumeReclaimPolicy: Recycle
-  storageClassName: nfs                   # take note of this name, for the future volume claim
-  mountOptions:
-    - hard
-    - nfsvers=4.1
+  storageClassName: nfs                   
   nfs:
-    path: /mnt/share/mehlj-pipeline/      # path to NFS share
+    path: /mnt/shares/mehlj-pipeline       # path to NFS share
     server: 192.168.1.72                  # NFS server IP

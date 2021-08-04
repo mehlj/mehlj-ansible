@@ -78,6 +78,11 @@
       - runc
     state: absent
 
+- name: Install nfs packages for future NFS volumes
+  yum:
+    name: nfs-utils
+    state: latest
+
 - name: Enable firewalld denied logging
   lineinfile:
     path: /etc/firewalld/firewalld.conf
