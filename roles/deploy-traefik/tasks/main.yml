@@ -41,6 +41,8 @@
     - svc2.yml
     - app-ingress.yml
     - hello2-ingress.yml
+    - nfs-pv.yml
+    - nfs-pvc.yml
 
 - name: Apply YAML
   shell: /usr/local/bin/kubectl apply -f "{{ item }}"
@@ -52,6 +54,8 @@
     - /tmp/svc2.yml
     - /tmp/app-ingress.yml
     - /tmp/hello2-ingress.yml
+    - /tmp/nfs-pv.yml
+    - /tmp/nfs-pvc.yml
     
 - name: Wait for http://app.lab.io to respond externally via ingress
   uri:
