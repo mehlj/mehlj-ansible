@@ -18,8 +18,15 @@ spec:
       labels:
         app: mehlj-pipeline 
     spec:
+      volumes:
+      - name: mehlj-pipeline-storage
+        persistentVolumeClaim:
+          claimName: nfs-pvc
       containers:
-      - name: mehlj-pipeline-pod
+      - name: mehlj-pipeline-ctr
         image: mehlj/mehlj-pipeline:latest
         ports:
         - containerPort: 3000
+        volumeMounts:
+          - mountPath: "/opt/db/"
+            name: mehlj-pipeline-storage
