@@ -36,3 +36,6 @@
     - nfs
     - rpc-bind
     - mountd
+
+- name: Run script to create SQLite DB and create table + default entries
+  script: init_db.sh
