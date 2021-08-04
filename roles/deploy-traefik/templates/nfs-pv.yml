@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-pv                            # name of persistent volume
+spec:
+  capacity:
+    storage: 10Gi                         # storage capacity
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany                       # access mode
+  persistentVolumeReclaimPolicy: Recycle
+  storageClassName: nfs                   # take note of this name, for the future volume claim
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /mnt/share/mehlj-pipeline/      # path to NFS share
+    server: 192.168.1.72                  # NFS server IP

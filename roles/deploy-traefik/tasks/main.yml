@@ -11,15 +11,13 @@
     port: 6443
     delay: 10
 
-- name: Merge public cert
+- name: Merge certs
   copy:
-    src: cert.crt
-    dest: /tmp/cert.crt
-
-- name: Merge private cert
-  copy:
-    src: key.pem
-    dest: /tmp/key.pem
+    src: "{{ item }}"
+    dest: "/tmp/{{ item }}"
+  loop:
+    - cert.crt
+    - key.pem
 
 - name: Add certs to kubernetes cluster as a secret
   shell: /usr/local/bin/kubectl create secret tls custom-default-cert --cert cert.crt --key key.pem
@@ -31,62 +29,30 @@
   args:
     chdir: /tmp/
 
-- name: Create TLSStore with custom certs for Traefik
+- name: Merge YAML
   template:
-    src: tlsstore.yml
-    dest: /tmp/tlsstore.yml
+    src: "{{ item }}"
+    dest: "/tmp/{{ item }}"
+  loop:
+    - tlsstore.yml
+    - app-deployment.yml
+    - deployment2.yml
+    - app-svc.yml
+    - svc2.yml
+    - app-ingress.yml
+    - hello2-ingress.yml
 
-- name: Apply TLSStore YAML
-  shell: /usr/local/bin/kubectl apply -f /tmp/tlsstore.yml
-
-- name: Merge mehlj-pipeline deployment YAML
-  template:
-    src: app-deployment.yml
-    dest: /tmp/app-deployment.yml
-
-- name: Apply mehlj-pipeline deployment YAML
-  shell: /usr/local/bin/kubectl apply -f /tmp/app-deployment.yml
-
-- name: Merge deployment2 YAML
-  template:
-    src: deployment2.yml
-    dest: /tmp/deployment2.yml
-
-- name: Apply deployment2 YAML
-  shell: /usr/local/bin/kubectl apply -f /tmp/deployment2.yml
-
-- name: Merge mehlj-pipeline service YAML
-  template:
-    src: app-svc.yml
-    dest: /tmp/app-svc.yml
-
-- name: Apply mehlj-pipeline service YAML
-  shell: /usr/local/bin/kubectl apply -f /tmp/app-svc.yml
-
-- name: Merge service2 YAML
-  template:
-    src: svc2.yml
-    dest: /tmp/svc2.yml
-
-- name: Apply service2 YAML
-  shell: /usr/local/bin/kubectl apply -f /tmp/svc2.yml
-
-- name: Merge mehlj-pipeline ingress YAML
-  template:
-    src: app-ingress.yml
-    dest: /tmp/app-ingress.yml
-
-- name: Apply mehlj-pipeline ingress YAML
-  shell: /usr/local/bin/kubectl apply -f /tmp/app-ingress.yml
-
-- name: Merge hello2 ingress YAML
-  template:
-    src: hello2-ingress.yml
-    dest: /tmp/hello2-ingress.yml
-
-- name: Apply hello2 ingress YAML
-  shell: /usr/local/bin/kubectl apply -f /tmp/hello2-ingress.yml
-
+- name: Apply YAML
+  shell: /usr/local/bin/kubectl apply -f "{{ item }}"
+  loop:
+    - /tmp/tlsstore.yml
+    - /tmp/app-deployment.yml
+    - /tmp/deployment2.yml
+    - /tmp/app-svc.yml
+    - /tmp/svc2.yml
+    - /tmp/app-ingress.yml
+    - /tmp/hello2-ingress.yml
+    
 - name: Wait for http://app.lab.io to respond externally via ingress
   uri:
     url: "http://app.lab.io:30001"
