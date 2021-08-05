@@ -39,3 +39,9 @@
 
 - name: Run script to create SQLite DB and create table + default entries
   script: init_db.sh
+
+- name: Create sym link to where the app expects it to be
+  file:
+    src: /mnt/shares/mehlj-pipeline
+    dest: /opt/db
+    state: link
