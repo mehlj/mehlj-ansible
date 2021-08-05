@@ -45,3 +45,13 @@
     src: /mnt/shares/mehlj-pipeline
     dest: /opt/db
     state: link
+
+- name: Change permissions on NFS directory
+  file:
+    path: /opt/db/
+    mode: '0777'
+
+- name: Change permissions on database
+  file:
+    path: /opt/db/api.db
+    mode: '0666'
