@@ -2,7 +2,7 @@
 - name: Add your ssh key to authorized_keys
   hosts: localhost
   roles:
-    - install-ssh-key
+    - ../roles/install-ssh-key
   tasks:
     # Note - below task may not be suited for prod. just for lab convenience
     - name: Enable password-less sudo for mehlj

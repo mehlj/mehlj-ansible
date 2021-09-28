@@ -3,4 +3,4 @@
   hosts: k8snode0
   become: yes
   roles:
-    - deploy-traefik
+    - ../roles/deploy-traefik

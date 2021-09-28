@@ -2,4 +2,4 @@
 - name: Install and configure NFS server, along with SQLite3 DB
   hosts: felwithe
   roles:
-    - install-nfs
+    - ../roles/install-nfs
