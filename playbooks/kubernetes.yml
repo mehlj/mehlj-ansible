@@ -3,7 +3,7 @@
   hosts: localhost
   become: yes
   roles:
-    - { role: ../roles/change-password, secret_name: mehlj_lab_creds }
+    - { role: ../roles/change-password, secret_name: mehlj_lab_creds, install_plugin: true }
 
 - name: Configure /etc/hosts with future k8s nodes
   hosts: localhost

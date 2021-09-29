@@ -2,6 +2,10 @@
 # tasks file for change-password
 
 - name: Change root and mehlj password
+  block:
+    - name: Install AWS plugin collection via ansible-galaxy
+      shell: ansible-galaxy collection install amazon.aws
+  when: install_plugin is defined
   vars:
     credentials: "{{ lookup('amazon.aws.aws_secret', secret_name) }}"
   user:
