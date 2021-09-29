@@ -5,8 +5,14 @@
   - name: Install AWS plugin collection via ansible-galaxy
     command: ansible-galaxy collection install amazon.aws
 
-  - name: Install boto3 and botocore
-    command: pip3 install boto3
+  - name: Install boto3 and botocore for root
+    pip:
+      name: [ "boto3", "botocore" ]
+
+  - name: Install boto3 and botocore for non-privileged users
+    pip:
+      name: [ "boto3", "botocore" ]
+      extra_args: "--user"
 
   when: install_plugin is defined
 
