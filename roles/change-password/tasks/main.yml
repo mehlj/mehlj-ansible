@@ -3,7 +3,10 @@
 - block:
 
   - name: Install AWS plugin collection via ansible-galaxy
-    shell: ansible-galaxy collection install amazon.aws
+    command: ansible-galaxy collection install amazon.aws
+
+  - name: Install boto3 and botocore
+    command: pip3 install boto3
 
   when: install_plugin is defined
 
