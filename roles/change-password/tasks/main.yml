@@ -8,7 +8,6 @@
   - name: Install boto3 and botocore 
     pip:
       name: [ "boto3", "botocore" ]
-      extra_args: "--user"
 
   when: install_plugin is defined
 
