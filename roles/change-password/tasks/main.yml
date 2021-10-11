@@ -13,10 +13,13 @@
 
 
 - name: Change root and mehlj password
-  environment:
-    AWS_DEFAULT_REGION: us-east-1
   vars:
-    credentials: "{{ lookup('amazon.aws.aws_secret', secret_name) }}"
+    AWS_REGION: 'us-east-1'
+    credentials: "{{ lookup('amazon.aws.aws_secret', 
+                  secret_name,
+                  region=AWS_REGION, 
+                  aws_secret_key=(AWS_SECRET_ACCESS_KEY | string), 
+                  aws_access_key=(AWS_ACCESS_KEY_ID | string)) }}"
   user:
     name: "{{ item }}"
     password: "{{ credentials.vsphere | password_hash('sha512') }}"
