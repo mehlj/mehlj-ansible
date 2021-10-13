@@ -1,15 +1,11 @@
 ---
 # tasks file for change-password
-- block:
+- name: Install AWS plugin collection via ansible-galaxy
+  command: ansible-galaxy collection install amazon.aws
 
-  - name: Install AWS plugin collection via ansible-galaxy
-    command: ansible-galaxy collection install amazon.aws
-
-  - name: Install boto3 and botocore 
-    pip:
-      name: [ "boto3", "botocore" ]
-
-  when: install_plugin is defined
+- name: Install boto3 and botocore 
+  pip:
+    name: [ "boto3", "botocore" ]
 
 - name: Check if boto3 is installed
   shell: pip3 list | grep boto3
