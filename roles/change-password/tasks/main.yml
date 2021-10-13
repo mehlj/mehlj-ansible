@@ -11,6 +11,13 @@
 
   when: install_plugin is defined
 
+- name: Check if boto3 is installed
+  shell: pip3 list | grep boto3
+
+- name: Sleep for 20 seconds and continue with play
+  wait_for:
+    timeout: 20
+  delegate_to: localhost
 
 - name: Change root and mehlj password
   vars:
