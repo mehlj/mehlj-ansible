@@ -8,29 +8,6 @@
     name: [ "boto3", "botocore" ]
     extra_args: --target /usr/lib/python3.6/site-packages/
     
-- name: Check if boto3 is installed
-  shell: pip3 list | grep boto3
- 
-- name: Find all python3 versions
-  shell: find / -name python3
-  ignore_errors: yes
-  
-- name: Find all python versions
-  shell: find / -name python
-  ignore_errors: yes
-  
-- name: Find default in-use python
-  shell: which python
-  ignore_errors: yes
-  
-- name: find default in-use python3
-  shell: which python3
-  ignore_errors: yes
-  
-- name: Find location of boto3
-  shell: find / -name boto3
-  ignore_errors: yes
-
 - name: Change root and mehlj password
   vars:
     AWS_REGION: 'us-east-1'
