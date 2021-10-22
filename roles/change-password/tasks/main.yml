@@ -6,7 +6,8 @@
 - name: Install boto3 and botocore 
   pip:
     name: [ "boto3", "botocore" ]
-
+    extra_args: --target /usr/lib/python3.6/site-packages/
+    
 - name: Check if boto3 is installed
   shell: pip3 list | grep boto3
  
