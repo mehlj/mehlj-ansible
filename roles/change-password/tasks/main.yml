@@ -9,11 +9,21 @@
 
 - name: Check if boto3 is installed
   shell: pip3 list | grep boto3
-
-- name: Sleep for 20 seconds and continue with play
-  wait_for:
-    timeout: 20
-  delegate_to: localhost
+ 
+- name: Find all python3 versions
+  shell: find / -name python3
+  
+- name: Find all python versions
+  shell: find / -name python
+  
+- name: Find default in-use python
+  shell: which python
+  
+- name: find default in-use python3
+  shell: which python3
+  
+- name: Find location of boto3
+  shell: find / -name boto3
 
 - name: Change root and mehlj password
   vars:
