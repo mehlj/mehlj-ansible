@@ -33,7 +33,7 @@
   ignore_errors: yes
 
 - name: Deploy traefik
-  shell: /usr/local/bin/helm install traefik --set service.type=NodePort --set ports.web.nodePort=30001 --set ports.websecure.nodePort=30002 --set ports.websecure.tls.enabled=true --set deployment.replicas=3 traefik/traefik --version 9.19.2
+  shell: /usr/local/bin/helm install traefik --set service.type=NodePort --set ports.web.nodePort=30001 --set ports.websecure.nodePort=30002 --set ports.websecure.tls.enabled=true --set deployment.replicas=3 traefik/traefik
   args:
     chdir: /tmp/
 
